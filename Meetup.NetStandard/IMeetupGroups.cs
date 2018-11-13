@@ -10,5 +10,6 @@ namespace Meetup.NetStandard
     {
         Task<MeetupResponse<Group>> Get(string groupName);
         Task<MeetupResponse<List<Group>>> Find();
+        Task<MeetupResponse<List<Group>>> Self();
     }
 }

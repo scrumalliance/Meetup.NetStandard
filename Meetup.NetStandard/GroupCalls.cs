@@ -29,5 +29,10 @@ namespace Meetup.NetStandard
         {
             return MeetupRequestMethods.GetWithRequestAsync<List<Group>>($"/find/groups", _options, null);
         }
+
+        public Task<MeetupResponse<List<Group>>> Self()
+        {
+            return MeetupRequestMethods.GetWithRequestAsync<List<Group>>($"/self/groups", _options, null);
+        }
     }
 }

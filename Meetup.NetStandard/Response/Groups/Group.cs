@@ -41,7 +41,7 @@ namespace Meetup.NetStandard.Response.Groups
         [JsonProperty("category")]
         public MeetupCategory Category { get; set; }
 
-        [JsonProperty("meta_categpry")]
+        [JsonProperty("meta_category")]
         public TopicCategory MetaCategory { get; set; }
 
         [JsonProperty("members")]
