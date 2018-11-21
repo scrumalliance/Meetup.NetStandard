@@ -56,6 +56,7 @@ namespace Meetup.NetStandard
         private IMeetupTopics _topics;
         private IMeetupEvents _events;
         private IMeetupGroups _groups;
+        private IMeetupPro _pro;
 
         public IMeetupMeta Meta => _meta ?? (_meta = new MetaCalls(Options));
         public IMeetupGeo Geo => _geo ?? (_geo = new GeoCalls(Options));
@@ -63,6 +64,7 @@ namespace Meetup.NetStandard
         public IMeetupTopics Topics => _topics ?? (_topics = new TopicCalls(Options));
         public IMeetupEvents Events => _events ?? (_events = new EventCalls(Options));
         public IMeetupGroups Groups => _groups ?? (_groups = new GroupCalls(Options));
+        public IMeetupPro Pro => _pro ?? (_pro = new ProCalls(Options));
 
         internal static MeetupClientOptions SetupOptions(MeetupClientOptions options, HttpClient client)
         {
