@@ -14,6 +14,9 @@ namespace Meetup.NetStandard.Response.Groups
         [JsonProperty("city")]
         public string City { get; set; }
 
+        [JsonProperty("state")]
+        public string State { get; set; }
+
         [JsonProperty("visibility")]
         public MeetupVisibility Visibility { get; set; }
 
