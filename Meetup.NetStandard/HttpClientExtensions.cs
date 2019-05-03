@@ -1,9 +1,9 @@
-﻿using System.ComponentModel;
+﻿using Meetup.NetStandard.Response;
+using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Meetup.NetStandard.Response;
-using Newtonsoft.Json;
 
 namespace Meetup.NetStandard
 {
@@ -21,17 +21,23 @@ namespace Meetup.NetStandard
             }
 
             var stream = await response.Content.ReadAsStreamAsync();
-            using (var reader = new JsonTextReader(new StreamReader(stream)))
+            var streamReader = new StreamReader(stream);
+            string json = await streamReader.ReadToEndAsync();
+            if (response.IsSuccessStatusCode)
             {
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    var objectContent = options.CustomSerializer.Deserialize<T>(reader);
+                    var objectContent = JsonConvert.DeserializeObject<T>(json);
                     return new MeetupResponse<T>(response, objectContent);
                 }
-
-                var errorContent = options.CustomSerializer.Deserialize<MeetupErrorContainer>(reader);
-                throw new MeetupException(response.StatusCode, errorContent.Errors);
+                catch (Exception ex)
+                {
+                    throw new Exception($"Failed to deserialize json: {json}", ex);
+                }
             }
+
+            var errorContent = JsonConvert.DeserializeObject<MeetupErrorContainer>(json);
+            throw new MeetupException(response.StatusCode, errorContent.Errors);
         }
     }
 }
