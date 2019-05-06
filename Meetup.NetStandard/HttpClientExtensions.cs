@@ -30,7 +30,7 @@ namespace Meetup.NetStandard
                     var objectContent = JsonConvert.DeserializeObject<T>(json);
                     return new MeetupResponse<T>(response, objectContent);
                 }
-                catch (Exception ex)
+                catch (JsonReaderException ex)
                 {
                     throw new Exception($"Failed to deserialize json: {json}", ex);
                 }
