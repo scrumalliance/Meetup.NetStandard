@@ -32,12 +32,19 @@ namespace Meetup.NetStandard
                 }
                 catch (JsonReaderException ex)
                 {
-                    throw new Exception($"Failed to deserialize json: {json}", ex);
+                    throw new Exception($"Failed to deserialize json to type {typeof(T)}: {json}", ex);
                 }
             }
 
-            var errorContent = JsonConvert.DeserializeObject<MeetupErrorContainer>(json);
-            throw new MeetupException(response.StatusCode, errorContent.Errors);
+            try
+            {
+                var errorContent = JsonConvert.DeserializeObject<MeetupErrorContainer>(json);
+                throw new MeetupException(response.StatusCode, errorContent.Errors);
+            }
+            catch (JsonReaderException ex)
+            {
+                throw new Exception($"Status Code: {response.StatusCode} - Failed to deserialize json as MeetupErrorContainer: {json}", ex);
+            }
         }
     }
 }
