@@ -1,36 +1,40 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Meetup.NetStandard.Request;
+using Meetup.NetStandard.Response;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Text;
-using Meetup.NetStandard.Request;
-using System;
-using Meetup.NetStandard.Response;
-using System.IO;
-using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace Meetup.NetStandard
 {
     internal static class MeetupRequestMethods
     {
+        internal static readonly int _retryCount = 10;
+        internal static readonly int _retryDelayMs = 10;
+
         internal static async Task<HttpResponseMessage> GetAsync(
             string requestUri,
             MeetupClientOptions options,
             MeetupRequest request = null)
         {
-            var fullUri = $"{requestUri}{BuildQueryString(request?.AsDictionary(),options)}";
+            var fullUri = $"{requestUri}{BuildQueryString(request?.AsDictionary(), options)}";
             var message = new HttpRequestMessage(HttpMethod.Get, fullUri);
 
             AddContext(message, request);
 
             var response = await options.Client.SendAsync(message);
+            int i = 0;
+            while (response.StatusCode == System.Net.HttpStatusCode.BadGateway && i++ < _retryCount)
+            {
+                await Task.Delay(_retryDelayMs);
+                response = await options.Client.SendAsync(message);
+            }
             return response;
         }
 
-        internal static async Task<HttpResponseMessage> PostAsync<TContent>(
-    string requestUri,
-    MeetupClientOptions options,
-        TContent content)
+        internal static async Task<HttpResponseMessage> PostAsync<TContent>(string requestUri, MeetupClientOptions options, TContent content)
         {
             var fullUri = $"{requestUri}{BuildQueryString(new Dictionary<string, string>(), options)}";
             var message = new HttpRequestMessage(HttpMethod.Post, fullUri);
@@ -44,6 +48,12 @@ namespace Meetup.NetStandard
             message.Content = new StreamContent(mem);
 
             var response = await options.Client.SendAsync(message);
+            int i = 0;
+            while (response.StatusCode == System.Net.HttpStatusCode.BadGateway && i++ < _retryCount)
+            {
+                await Task.Delay(_retryDelayMs);
+                response = await options.Client.SendAsync(message);
+            }
             return response;
         }
 
@@ -74,20 +84,20 @@ namespace Meetup.NetStandard
 
         private static string BuildQueryString(Dictionary<string, string> qstring, MeetupClientOptions options)
         {
-            if(qstring == null && options.AddedQueryString == null)
+            if (qstring == null && options.AddedQueryString == null)
             {
                 return string.Empty;
             }
 
             var osb = new StringBuilder();
-            var added = AddTo(osb, qstring,true);
+            var added = AddTo(osb, qstring, true);
             added = AddTo(osb, options.AddedQueryString, added);
             return osb.ToString();
         }
 
         private static bool AddTo(StringBuilder osb, Dictionary<string, string> queryString, bool first)
         {
-            if((queryString?.Count ?? 0) == 0)
+            if ((queryString?.Count ?? 0) == 0)
             {
                 return first;
             }
