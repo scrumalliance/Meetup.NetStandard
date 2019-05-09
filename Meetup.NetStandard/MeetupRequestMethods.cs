@@ -12,7 +12,7 @@ namespace Meetup.NetStandard
     internal static class MeetupRequestMethods
     {
         internal static readonly int _retryCount = 10;
-        internal static readonly int _retryDelayMs = 10;
+        internal static readonly int _retryDelayMs = 1000;
 
         internal static async Task<HttpResponseMessage> GetAsync(
             string requestUri,
