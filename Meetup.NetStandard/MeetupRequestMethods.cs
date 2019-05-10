@@ -29,6 +29,7 @@ namespace Meetup.NetStandard
             while (response.StatusCode == System.Net.HttpStatusCode.BadGateway && i++ < _retryCount)
             {
                 await Task.Delay(_retryDelayMs);
+                message = new HttpRequestMessage(HttpMethod.Get, fullUri);
                 response = await options.Client.SendAsync(message);
             }
             return response;
@@ -52,6 +53,7 @@ namespace Meetup.NetStandard
             while (response.StatusCode == System.Net.HttpStatusCode.BadGateway && i++ < _retryCount)
             {
                 await Task.Delay(_retryDelayMs);
+                message = new HttpRequestMessage(HttpMethod.Post, fullUri);
                 response = await options.Client.SendAsync(message);
             }
             return response;
